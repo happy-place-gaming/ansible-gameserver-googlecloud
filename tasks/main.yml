@@ -1,4 +1,4 @@
-- name: create disk ({{ instance_disk_size }} GB) for {{ game_slug }}
+- name: create disk ({{ instance_disk_size }} GB) for {{ game }}
   gcp_compute_disk:
     name: "disk-{{ game }}-{{ discord_voice_channel_id }}"
     size_gb: "{{ instance_disk_size }}"
