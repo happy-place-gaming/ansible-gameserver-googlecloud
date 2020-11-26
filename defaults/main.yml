@@ -1,0 +1,9 @@
+gcp_cred_file: "files/happyplace-6be8e5a65dd5.json"
+gcp_project: happyplace
+gcp_cred_kind: serviceaccount
+gcp_zone: "europe-west3-c"
+gcp_region: "europe-west3"
+instance_disk_size: 10
+machine_type: n1-standard-1
+scopes:
+  - https://www.googleapis.com/auth/compute

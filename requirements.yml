@@ -1,0 +1,3 @@
+- name: docker
+  src: https://github.com/oliverlorenz/ansible-docker
+  version: 1.0.0

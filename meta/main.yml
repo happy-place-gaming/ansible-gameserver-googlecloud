@@ -1,0 +1,4 @@
+galaxy_info:
+  author: Oliver Lorenz
+  description: installs a happy place game server in the google cloud
+  min_ansible_version: 2.9

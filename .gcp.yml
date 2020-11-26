@@ -1,0 +1,6 @@
+plugin: gcp_compute
+projects:
+  - happyplace
+auth_kind: serviceaccount
+service_account_file: files/happyplace-536f91a9f7e1.json
+host_key_checking: false
