@@ -84,13 +84,6 @@
       - "{{ game }}-server"
     state: present
 
-- name: Add tags to instance
-  community.general.gce_tag:
-    instance_name: "{{ game }}-{{ discord_voice_channel_id }}"
-    tags: "{{ game }}-server"
-    zone: "{{ gcp_zone }}"
-    state: present
-
 - name: Wait for SSH to come up {{ address.address }}
   wait_for:
     host: "{{ address.address }}"
