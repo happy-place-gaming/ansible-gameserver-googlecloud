@@ -22,19 +22,7 @@
       - https://www.googleapis.com/auth/compute
     state: present
   register: network
-
-- name: create a address for {{ game }}-{{ discord_voice_channel_id }}
-  gcp_compute_address:
-    name: "address-{{ game }}-{{ discord_voice_channel_id }}"
-    region: "{{ gcp_region }}"
-    project: "{{ gcp_project }}"
-    auth_kind: "{{ gcp_cred_kind }}"
-    service_account_file: "{{ gcp_cred_file }}"
-    scopes:
-      - https://www.googleapis.com/auth/compute
-    state: present
-  register: address
-
+  
 - name: create a instance "{{ game }}-{{ discord_voice_channel_id }}" size {{ machine_type }}
   gcp_compute_instance:
     state: present
@@ -48,16 +36,31 @@
     network_interfaces:
       - network: "{{ network }}"
         access_configs:
-          - name: "External NAT"
-            nat_ip: "{{ address }}"
-            type: "ONE_TO_ONE_NAT"
+        - name: External NAT
+          type: ONE_TO_ONE_NAT
     zone: "{{ gcp_zone }}"
     project: "{{ gcp_project }}"
     auth_kind: "{{ gcp_cred_kind }}"
     service_account_file: "{{ gcp_cred_file }}"
+    tags:
+      fingerprint: "ssh-server{{ game }}-server"
+      items:
+        - ssh-server
+        - "{{ game }}-server"
     scopes:
       - https://www.googleapis.com/auth/compute
+    status: RUNNING
   register: instance
+
+- debug:
+    msg: "{{ instance.networkInterfaces }}"
+
+# - name: Add tags to instance
+#   community.google.gce_tag:
+#     instance_name: "{{ game }}-{{ discord_voice_channel_id }}"
+#     tags: ssh-server,{{ game }}-server,test-server
+#     zone: "{{ gcp_zone }}"
+#     state: present
 
 - name: ensure firewall rule is created (ssh-server)
   gcp_compute_firewall:
@@ -84,14 +87,14 @@
       - "{{ game }}-server"
     state: present
 
-- name: Wait for SSH to come up {{ address.address }}
+- name: Wait for SSH to come up {{ instance.networkInterfaces[0].accessConfigs[0].natIP }}
   wait_for:
-    host: "{{ address.address }}"
+    host: "{{ instance.networkInterfaces[0].accessConfigs[0].natIP }}"
     port: 22
     delay: 10
     timeout: 60
 
 - name: Add host to groupname
   add_host:
-    hostname: "{{ address.address }}"
+    hostname: "{{ instance.networkInterfaces[0].accessConfigs[0].natIP }}"
     groupname: "{{ game }}_{{ discord_voice_channel_id }}_hosts"
